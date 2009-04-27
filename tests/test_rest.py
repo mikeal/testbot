@@ -39,7 +39,7 @@ def test_creation():
     assert json.loads(content) == pool
     
 def test_add_resource_to_pool():
-     
+     pass
      
     
     

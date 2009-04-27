@@ -88,7 +88,7 @@ class MasterRestApplication(RestApplication):
     def POST(self, request, query_type):
         # if query_type == "types":
         #     self.storage.add_type(json.loads(str(request.body)))
-            return Response201("Created")
+            # return Response201("Created")
         if query_type == "pools":
             self.storage.add_pool(json.loads(str(request.body)))
             return Response201("Created")
