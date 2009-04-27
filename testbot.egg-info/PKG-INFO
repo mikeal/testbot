@@ -1,0 +1,16 @@
+Metadata-Version: 1.0
+Name: testbot
+Version: 0.1pre
+Summary: Test Automation and Distribution System.
+Home-page: UNKNOWN
+Author: Mozilla, Mikeal Rogers
+Author-email: mikeal.rogers@gmail.com
+License: http://www.mozilla.org/MPL/
+Description: Aims to simplify the vast resource management required for automated test distribution and management.
+Platform: Any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
