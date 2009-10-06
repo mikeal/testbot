@@ -1,9 +1,0 @@
-setup.py
-testbot/__init__.py
-testbot.egg-info/PKG-INFO
-testbot.egg-info/SOURCES.txt
-testbot.egg-info/dependency_links.txt
-testbot.egg-info/requires.txt
-testbot.egg-info/top_level.txt
-tests/__init__.py
-tests/test_rest.py

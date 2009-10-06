@@ -41,7 +41,7 @@ desc = """Test Automation and Distribution System."""
 summ = """Aims to simplify the vast resource management required for automated test distribution and management."""
 
 PACKAGE_NAME = "testbot"
-PACKAGE_VERSION = "0.1pre"
+PACKAGE_VERSION = "0.2pre"
 
 setup(name=PACKAGE_NAME,
       version=PACKAGE_VERSION,
@@ -54,8 +54,12 @@ setup(name=PACKAGE_NAME,
       packages=find_packages(exclude=['test']),
       include_package_data=True,
       package_data = {'': ['*.js', '*.css', '*.html', '*.txt', '*.xpi', '*.rdf', '*.xul', '*.jsm', '*.xml'],},
+      entry_points="""
+            [console_scripts]
+            testbot = testbot:cli
+      """,
       platforms =['Any'],
-      install_requires = ['webenv','CherryPy'],
+      install_requires = ['webenv','couchquery','mako'],
       classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'Intended Audience :: Developers',
