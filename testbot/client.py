@@ -2,13 +2,12 @@ import os
 import sys
 from time import sleep
 from threading import Thread
+from httplib2 import Http
 
 try:
     import json
 except:
     import simplejson as json
-
-from httplib2 import Http
 
 http = Http()
 
@@ -60,6 +59,7 @@ class Client(object):
         
     def get_job(self):
         resp, content = http.request(self.server_uri+'api/getJob', method='POST', body=json.dumps(self.client_info))
+        assert resp
         if resp.status == 200:
             job = json.loads(content)
             self.client_info['job'] = job
@@ -95,7 +95,7 @@ class Client(object):
             sleep(self.heartbeat_interval)
     
     def start_heartbeat(self):
-        self.heartbeat_thread = Thread(target=self.run)
+        self.heartbeat_thread = Thread(target=self.heartbeat)
         self.heartbeat_thread.start()
         return self.heartbeat_thread
     
@@ -105,8 +105,17 @@ class Client(object):
             sleep(self.heartbeat_interval / 4)    
     
     def push_status(self):
-        resp, content = http.request(self.server_uri+'api/heatbeat/'+self.client_info['_id'], method='POST', body=json.dumps(self.client_info))
+        resp, content = http.request(self.server_uri+'api/heartbeat/'+self.client_info['_id'], method='POST', body=json.dumps(self.client_info))
         assert resp.status == 200
+        info = json.loads(content)
+        self.client_info['_rev'] = info['rev']
+    
+    def report(self, job, result):
+        resp, content = http.request(self.server_uri+'api/report/'+job['_id'], method='POST', body=json.dumps(result))
+        assert resp.status == 200
+        if not content:
+            return None
+        return json.loads(content)
     
     def _do_job(self, job):
         if not hasattr(self, 'do_job'):

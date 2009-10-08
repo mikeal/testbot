@@ -1,49 +1,25 @@
+import os
 import sys
-
-try:
-    import json
-except:
-    import simplejson as json
-
 from wsgiref.simple_server import make_server
+from datetime import datetime
+
 from couchquery import Database
-from webenv.rest import RestApplication
-from webenv import Response200
 
+this_directory = os.path.abspath(os.path.dirname(__file__))
 
-class TestBotApplication(RestApplication):
-    def __init__(self, db):
-        RestApplication.__init__(self)
-        self.db = db
-        self.add_resource("api", TestBotAPI(db))
+design_dir = os.path.join(this_directory, 'design')
+clients_design_dir = os.path.join(design_dir, 'clients')
+jobs_design_dir = os.path.join(design_dir, 'jobs')
 
-class TestBotAPI(RestApplication):
-    def __init__(self, db):
-        RestApplication.__init__(self)
-        self.db = db
-    def POST(self, request, collection, resource=None):
-        if collection == 'getJob':
-            client_dict = json.loads(str(request.body))
-            client = self.db.get(client_dict['_id'])
-            if dict(client) != client_dict:
-                client.update(client_dict)
-                
-            # Add job getting logic
-            
-        
-        if collection == 'heartbeat':
-            client = self.db.get(resource)
-            status = json.loads(str(request.body))
-            if client.status != status:
-                client.status = status
-                self.db.save(client)
-            return Response200('')
-        
-        
-    def GET(self, request, collection):
-        if collection == 'whoami':
-            print dir(request.query)
-            result = self.db.views.clients.clientByName(key=name)
+def create_job(db, job):
+    job['type'] = 'job'
+    job['creationdt'] = datetime.now().isoformat()
+    job['status'] = 'pending'
+    db.create(job)
+
+def sync(db):
+    db.sync_design_doc('clients', clients_design_dir)
+    db.sync_design_doc('jobs', jobs_design_dir)
 
 def cli():
     if not sys.argv[-1].startswith('http'):
@@ -52,9 +28,10 @@ def cli():
         dburi = sys.argv[-1]
     
     db = Database(dburi)
+    sync(db)
     print "Using CouchDB @ "+dburi
+    from testbot.server import TestBotApplication
     application = TestBotApplication(db)
     httpd = make_server('', 8888, application)
     print "Serving on http://localhost:8888/"
     httpd.serve_forever()
-
