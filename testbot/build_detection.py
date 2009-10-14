@@ -31,9 +31,9 @@ class BuildChecker(object):
         self.http = httplib2.Http()
         
     def parse_build_page(self, base_uri, d):
-        tarballs = [n for n in d("a") if '.' in n.text]
+        uris = [n for n in d("a") if '.' in n.text]
         
-        buildinfo = {'uris':[base_uri + n.text for n in tarballs]}  
+        buildinfo = {'uris':[base_uri + n.text for n in uris]}  
         return buildinfo
     
 
