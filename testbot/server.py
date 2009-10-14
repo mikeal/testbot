@@ -70,12 +70,16 @@ class TestBotAPI(RestApplication):
         if collection == 'newBuild':
             build = json.loads(str(request.body))
             build['type'] = 'build'
-            info = self.db.create(build)
-            build['_id'] = info['id']
-            build['_rev'] = info['rev']
+            build_info = self.db.create(build)
+            build['_id'] = build_info['id']
+            build['_rev'] = build_info['rev']
             jobs = self.manager.new_build(build)
-            self.db.create(jobs)
-            return JSONResponse(jobs)
+            jobs_info = self.db.create(jobs)
+            for i in range(len(jobs_info)):
+                jobs[i]['_id'] = jobs_info[i]['id']
+                jobs[i]['_rev'] = jobs_info[i]['rev']
+            # We re-get the build document because the manager.new_build call may have modified it
+            return JSONResponse({'build':self.db.get(build_info['id']),'jobs':jobs})
         
         if collection == 'heartbeat':
             client = self.db.get(resource)

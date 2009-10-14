@@ -9,7 +9,7 @@ from pyquery import PyQuery
 
 products = {'firefox':
                 {'uri':'http://ftp.mozilla.org/pub/mozilla.org/firefox/tinderbox-builds/',
-                 'branches':['mozilla-central-linux']
+                 'branches':['mozilla-central-linux', 'mobile-1.9.2'],
                 },
            }
 
@@ -29,6 +29,13 @@ class BuildChecker(object):
             testbot_uri += '/'
         self.testbot_uri = testbot_uri
         self.http = httplib2.Http()
+        
+    def parse_build_page(self, base_uri, d):
+        tarballs = [n for n in d("a") if '.' in n.text]
+        
+        buildinfo = {'uris':[base_uri + n.text for n in tarballs]}  
+        return buildinfo
+    
 
     def check_product(self, name, info):
         for branch in info['branches']:
@@ -43,21 +50,10 @@ class BuildChecker(object):
                 base_uri = url + '/' + build + '/'
                 resp, content = self.http.request(base_uri)
                 d = PyQuery(content)
-                tarballs = [n for n in d("a") if 'tar.bz2' in n.text]
-                if '.tests.tar' in tarballs[0].text:
-                    tests_tarball = tarballs[0].text
-                    build_tarball = tarballs[1].text
-                else:
-                    tests_tarball = tarballs[1].text
-                    build_tarball = tarballs[0].text
-                
-                buildinfo = {'product':name, 'branch':branch, 'buildid':build, 
-                             'build_tarball':base_uri + build_tarball, 
-                             'tests_tarball':base_uri + tests_tarball}  
-                
+                build_info = self.parse_build_page(base_uri, d)
+                build_info.update({'product':name, 'branch':branch, 'buildid':build, })
                 resp, content = self.http.request(self.testbot_uri + 'api/newBuild', method='POST', 
-                                                  body=json.dumps(buildinfo)) 
-                
+                                                  body=json.dumps(build_info)) 
                 assert resp.status == 200
                 self.cache[name][branch]['builds'].append(build)
                 
