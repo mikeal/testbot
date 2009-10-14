@@ -31,7 +31,22 @@ def cli():
     sync(db)
     print "Using CouchDB @ "+dburi
     from testbot.server import TestBotApplication
-    application = TestBotApplication(db)
+    application = TestBotApplication(db, MozillaManager())
     httpd = make_server('', 8888, application)
     print "Serving on http://localhost:8888/"
     httpd.serve_forever()
+    
+class TestBotManager(object):
+    pass    
+
+class MozillaManager(object):
+    """Logic for handling Mozilla's builds and tests"""
+    
+    def new_build(self, build):
+        jobs = []
+        for testtype in ['mochitest', 'reftest', 'mochitest-chrome']:
+            jobs.append({'build':build, 'testtype':testtype})
+        return jobs
+
+
+    

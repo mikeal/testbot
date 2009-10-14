@@ -6,7 +6,7 @@ except:
     import simplejson as json
 
 from webenv.rest import RestApplication
-from webenv import Response, HtmlResponse
+from webenv import Response, HtmlResponse, Response201
 from mako.lookup import TemplateLookup
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
@@ -30,15 +30,25 @@ class Response204(Response):
     status = '204 Not Content'
 
 class TestBotApplication(RestApplication):
-    def __init__(self, db):
+    def __init__(self, db, manager):
         RestApplication.__init__(self)
         self.db = db
-        self.add_resource("api", TestBotAPI(db))
+        self.manager = manager
+        self.add_resource("api", TestBotAPI(db, manager))
+        
+    def GET(self, request, collection=None, resource=None):
+        if collection is None:
+            return # Index
+        if collection == 'clients':
+            pass
+        
 
 class TestBotAPI(RestApplication):
-    def __init__(self, db):
+    def __init__(self, db, manager):
         RestApplication.__init__(self)
         self.db = db
+        self.manager = manager
+        
     def POST(self, request, collection, resource=None):
         if collection == 'getJob':
             client_dict = json.loads(str(request.body))
@@ -56,6 +66,16 @@ class TestBotAPI(RestApplication):
                     self.db.save(job)
                     return JSONResponse(job)
             return Response204()    
+        
+        if collection == 'newBuild':
+            build = json.loads(str(request.body))
+            build['type'] = 'build'
+            info = self.db.create(build)
+            build['_id'] = info['id']
+            build['_rev'] = info['rev']
+            jobs = self.manager.new_build(build)
+            self.db.create(jobs)
+            return JSONResponse(jobs)
         
         if collection == 'heartbeat':
             client = self.db.get(resource)
