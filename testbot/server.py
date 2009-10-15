@@ -6,7 +6,7 @@ except:
     import simplejson as json
 
 from webenv.rest import RestApplication
-from webenv import Response, HtmlResponse, Response201
+from webenv import Response, HtmlResponse, Response201, Response404
 from mako.lookup import TemplateLookup
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
@@ -40,7 +40,20 @@ class TestBotApplication(RestApplication):
         if collection is None:
             return # Index
         if collection == 'clients':
-            pass
+            if resource is None:
+                pass # Client Index
+            client = self.db.get(resource)
+            if client.type != 'client':
+                return Response404()
+            return JSONResponse(client)
+        if collection == 'jobs':
+            if resource is None:
+                pass # Jobs Index
+            job = self.db.get(resource)
+            if job.type != 'job':
+                return Response404()
+            # Placeholder response until we write a template
+            return JSONResponse(job)
         if collection == 'builds':
             if resource is None:
                 limit = request.query.get('limit', 10)
@@ -50,7 +63,11 @@ class TestBotApplication(RestApplication):
                 for build in latest_builds:
                     build['jobs'] = latest_jobs[build['_id']]
                 return MakoResponse('builds', builds=latest_builds)
-        
+            build = self.db.get(resource)
+            if build.type != 'build':
+                return Response404()
+            # Placeholder response until we write a template
+            return JSONResponse(build)
 
 class TestBotAPI(RestApplication):
     def __init__(self, db, manager):
