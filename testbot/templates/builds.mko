@@ -25,6 +25,7 @@ $(document).ready(function()
       <th>buildid</th>
       <th>timestamp</th>
       <th>branch</th>
+      <th>urls</th>
       <th>jobs</th>
     </tr>
   </thead>
@@ -37,6 +38,7 @@ $(document).ready(function()
     <td><a href="/builds/${build['_id']}">${build.get('buildid')}</a></td>
     <td>${build.get('timestamp')}</td>
     <td>${build.get('branch')}</td>
+    <td>${'<br>'.join(['<a href='+'"'+uri+'">'+uri.split('/')[-1]+'</a>' for uri in build.get('uris', [])])}</td>
     <td>
       <table class="tablesorter">
         <thead>
