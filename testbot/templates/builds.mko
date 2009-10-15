@@ -1,0 +1,64 @@
+<%inherit file="base.mko"/>
+
+<%def name="body()">
+
+<h2>Builds</h2>
+
+<script type="text/javascript" src="/static/jquery-1.3.1.js" ></script>
+<script type="text/javascript" src="/static/tablesorter/jquery.tablesorter.min.js" ></script>
+<link rel="stylesheet" href="/static/tablesorter/css/jq.css" type="text/css" media="print, projection, screen" />
+<link rel="stylesheet" href="/static/tablesorter/themes/blue/style.css" type="text/css" media="print, projection, screen" />
+
+<script type="text/javascript">
+$(document).ready(function() 
+    { 
+        $("table.tablesorter").tablesorter(); 
+        
+    } 
+);
+</script>
+
+<table class="tablesorter" id="builds">
+  <thead>
+    <tr>
+      <th>product</th>
+      <th>buildid</th>
+      <th>timestamp</th>
+      <th>branch</th>
+      <th>jobs</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+
+% for build in builds:
+  <tr>
+    <td>${build.get('product')}</td>
+    <td><a href="/builds/${build['_id']}">${build.get('buildid')}</a></td>
+    <td>${build.get('timestamp')}</td>
+    <td>${build.get('branch')}</td>
+    <td>
+      <table class="tablesorter">
+        <thead>
+          <tr>
+            <th>timestamp</th>
+            <th>status</th>
+            <th>testtype</th>
+          </tr>
+        </thead>
+        <tbody>
+% for job in build.jobs:
+          <tr>
+            <td><a href="/jobs/${job['_id']}">${job['creationdt']}</a></td>
+            <td>${job['status']}</td>
+            <td>${job['testtype']}</td>
+          </tr>
+% endfor
+        </tbody>
+      </table>
+  </tr>
+% endfor
+</tbody>
+</table>  
+
+</%def>

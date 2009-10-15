@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 try:
     import json
 except:
@@ -41,6 +41,15 @@ class TestBotApplication(RestApplication):
             return # Index
         if collection == 'clients':
             pass
+        if collection == 'builds':
+            if resource is None:
+                limit = request.query.get('limit', 10)
+                latest_builds = self.db.views.builds.byTimestamp(limit=10, descending=True)
+                print len(latest_builds)
+                latest_jobs = self.db.views.jobs.byBuild(keys=[b['_id'] for b in latest_builds])
+                for build in latest_builds:
+                    build['jobs'] = latest_jobs[build['_id']]
+                return MakoResponse('builds', builds=latest_builds)
         
 
 class TestBotAPI(RestApplication):
@@ -70,10 +79,17 @@ class TestBotAPI(RestApplication):
         if collection == 'newBuild':
             build = json.loads(str(request.body))
             build['type'] = 'build'
+            if 'timestamp' not in build:
+                build['timestamp'] = datetime.now().isoformat()
             build_info = self.db.create(build)
             build['_id'] = build_info['id']
             build['_rev'] = build_info['rev']
             jobs = self.manager.new_build(build)
+            for job in jobs:
+                job['type'] = 'job'
+                job['status'] = 'pending'
+                if 'creationdt' not in job:
+                    job['creationdt'] = datetime.now().isoformat()
             jobs_info = self.db.create(jobs)
             for i in range(len(jobs_info)):
                 jobs[i]['_id'] = jobs_info[i]['id']

@@ -4,12 +4,15 @@ from wsgiref.simple_server import make_server
 from datetime import datetime
 
 from couchquery import Database
+from webenv.applications.file_server import FileServerApplication
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
 
 design_dir = os.path.join(this_directory, 'design')
+static_dir = os.path.join(this_directory, 'static')
 clients_design_dir = os.path.join(design_dir, 'clients')
 jobs_design_dir = os.path.join(design_dir, 'jobs')
+builds_design_dir = os.path.join(design_dir, 'builds')
 
 def create_job(db, job):
     job['type'] = 'job'
@@ -20,6 +23,7 @@ def create_job(db, job):
 def sync(db):
     db.sync_design_doc('clients', clients_design_dir)
     db.sync_design_doc('jobs', jobs_design_dir)
+    db.sync_design_doc('builds', builds_design_dir)
 
 def cli():
     if not sys.argv[-1].startswith('http'):
@@ -32,6 +36,7 @@ def cli():
     print "Using CouchDB @ "+dburi
     from testbot.server import TestBotApplication
     application = TestBotApplication(db, MozillaManager())
+    application.add_resource('static', FileServerApplication(static_dir))
     httpd = make_server('', 8888, application)
     print "Serving on http://localhost:8888/"
     httpd.serve_forever()
