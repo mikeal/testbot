@@ -1,0 +1,4 @@
+# Sphinx inventory version 1
+# Project: testbot
+# Version: 0.3
+testbot mod index.html
