@@ -47,7 +47,30 @@ The easiest way to write a client is to subclass :class:`Client` ::
 
 You can now start the client. If you would like to block indefinitely you can call :class:`Client.run()`, if you would like to start a background thread to handle jobs you can use :class:`Client.start()`. If you start a Client instance using :class:`Client.start()` you can stop it using :class:`Client.stop()`. Calling :class:`Client.stop()` will block until the current do_job call finishes if one is currently running.
 
-Clients register with the testbot server, by default they create an attribute called `capabilities` which includes two other attributes, `platform` and `jobtypes`. In the example above only `jobtypes` is defined, which will be included in this capabilities information. By default :class:`Client` pulls platform information out of the Python interpreter which works for most client's but this can be overwritten.
+Clients register with the testbot server, by default they create an attribute called `capabilities` which includes two other attributes, `platform` and `jobtypes`. In the example above only `jobtypes` is defined because by default :class:`Client` will pull platform information out of the Python interpreter which works for most clients but not all. For instance, here is a client that supports a mobile platform that might be tethered to a machine that is running this code. ::
+
+   class MobileClient(MyClient):
+       jobtypes = ['mobile-unittest']
+       platform = {'name':'Nokia N900', 'os.name':'Maemo', 'os.version':'4.1.0'}
+
+If necessary, you can even override the entire capabilities attribute if you need to support a more customized configuration. ::
+
+   import os
+   sysname, nodename, release, version, machine = os.uname()
+
+   class MultiPythonClient(MyClient):
+       capabilities = {'jobtypes':'python-unittest',
+                       'platforms': [{'os.name':sysname,
+                                      'os.version':version,
+                                      'python.version':'2.5.1',
+                                     },
+                                     {'os.name':sysname,
+                                      'os.version':version,
+                                      'python.version':'2.6.2',
+                                     }]
+                       }
+
+The example is a client that can run Python unittests on multiple versions of Python by making shell calls out to different Python binaries. The server will be able to use this information when assigning jobs to this client.
 
 
 

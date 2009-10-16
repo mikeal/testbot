@@ -51,19 +51,28 @@ Clients register with the testbot server, by default they create an attribute ca
 
    class MobileClient(MyClient):
        jobtypes = ['mobile-unittest']
-       platform = {'name':'Nokia N900', 'osname':'Maemo', 'osversion':'4.1.0'}
+       platform = {'name':'Nokia N900', 'os.name':'Maemo', 'os.version':'4.1.0'}
 
-If necessary, you can even override the entire capabilities attribute if you need to support a more customized configuration.
+If necessary, you can even override the entire capabilities attribute if you need to support a more customized configuration. ::
+
+   import os
+   sysname, nodename, release, version, machine = os.uname()
 
    class MultiPythonClient(MyClient):
        capabilities = {'jobtypes':'python-unittest',
-                       'platforms': [{'osname':'linux2'
-                                       
+                       'platforms': [{'os.name':sysname,
+                                      'os.version':version,
+                                      'python.version':'2.5.1',
                                      },
-                                     {
-                                     
+                                     {'os.name':sysname,
+                                      'os.version':version,
+                                      'python.version':'2.6.2',
                                      }]
-                      }
+                       }
+
+The example is a client that can run Python unittests on multiple versions of Python by making shell calls out to different Python binaries. The server will be able to use this information when assigning jobs to this client.
+
+
 
 .. module:: testbot
    :synopsis: Test Automation and Distribution System.

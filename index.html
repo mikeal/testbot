@@ -71,7 +71,30 @@ $ python ez_setup.py</pre>
 </pre></div>
 </div>
 <p>You can now start the client. If you would like to block indefinitely you can call <tt class="xref docutils literal"><span class="pre">Client.run()</span></tt>, if you would like to start a background thread to handle jobs you can use <tt class="xref docutils literal"><span class="pre">Client.start()</span></tt>. If you start a Client instance using <tt class="xref docutils literal"><span class="pre">Client.start()</span></tt> you can stop it using <tt class="xref docutils literal"><span class="pre">Client.stop()</span></tt>. Calling <tt class="xref docutils literal"><span class="pre">Client.stop()</span></tt> will block until the current do_job call finishes if one is currently running.</p>
-<p>Clients register with the testbot server, by default they create an attribute called <cite>capabilities</cite> which includes two other attributes, <cite>platform</cite> and <cite>jobtypes</cite>. In the example above only <cite>jobtypes</cite> is defined, which will be included in this capabilities information. By default <tt class="xref docutils literal"><span class="pre">Client</span></tt> pulls platform information out of the Python interpreter which works for most client&#8217;s but this can be overwritten.</p>
+<p>Clients register with the testbot server, by default they create an attribute called <cite>capabilities</cite> which includes two other attributes, <cite>platform</cite> and <cite>jobtypes</cite>. In the example above only <cite>jobtypes</cite> is defined because by default <tt class="xref docutils literal"><span class="pre">Client</span></tt> will pull platform information out of the Python interpreter which works for most clients but not all. For instance, here is a client that supports a mobile platform that might be tethered to a machine that is running this code.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MobileClient</span><span class="p">(</span><span class="n">MyClient</span><span class="p">):</span>
+    <span class="n">jobtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;mobile-unittest&#39;</span><span class="p">]</span>
+    <span class="n">platform</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="s">&#39;Nokia N900&#39;</span><span class="p">,</span> <span class="s">&#39;os.name&#39;</span><span class="p">:</span><span class="s">&#39;Maemo&#39;</span><span class="p">,</span> <span class="s">&#39;os.version&#39;</span><span class="p">:</span><span class="s">&#39;4.1.0&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>If necessary, you can even override the entire capabilities attribute if you need to support a more customized configuration.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">sysname</span><span class="p">,</span> <span class="n">nodename</span><span class="p">,</span> <span class="n">release</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">machine</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">uname</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">MultiPythonClient</span><span class="p">(</span><span class="n">MyClient</span><span class="p">):</span>
+    <span class="n">capabilities</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;jobtypes&#39;</span><span class="p">:</span><span class="s">&#39;python-unittest&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;platforms&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&#39;os.name&#39;</span><span class="p">:</span><span class="n">sysname</span><span class="p">,</span>
+                                   <span class="s">&#39;os.version&#39;</span><span class="p">:</span><span class="n">version</span><span class="p">,</span>
+                                   <span class="s">&#39;python.version&#39;</span><span class="p">:</span><span class="s">&#39;2.5.1&#39;</span><span class="p">,</span>
+                                  <span class="p">},</span>
+                                  <span class="p">{</span><span class="s">&#39;os.name&#39;</span><span class="p">:</span><span class="n">sysname</span><span class="p">,</span>
+                                   <span class="s">&#39;os.version&#39;</span><span class="p">:</span><span class="n">version</span><span class="p">,</span>
+                                   <span class="s">&#39;python.version&#39;</span><span class="p">:</span><span class="s">&#39;2.6.2&#39;</span><span class="p">,</span>
+                                  <span class="p">}]</span>
+                    <span class="p">}</span>
+</pre></div>
+</div>
+<p>The example is a client that can run Python unittests on multiple versions of Python by making shell calls out to different Python binaries. The server will be able to use this information when assigning jobs to this client.</p>
 </div>
 </div>
 
