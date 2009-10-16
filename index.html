@@ -1,1 +1,132 @@
-My GitHub Page
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tesbot – Test Automation and Distribution System &mdash; testbot v0.3 documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.3',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="testbot v0.3 documentation" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="">testbot v0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tesbot-test-automation-and-distribution-system">
+<h1>tesbot &#8211; Test Automation and Distribution System<a class="headerlink" href="#tesbot-test-automation-and-distribution-system" title="Permalink to this headline">¶</a></h1>
+<p>Testbot is a continuous integration server and client for distributing and running tests. It uses simple REST and JSON interfaces so that it can be easily extensible.</p>
+<ul class="simple">
+</ul>
+<div class="section" id="installation">
+<span id="id1"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p><cite>testbot</cite> requires <a class="reference external" href="http://pypi.python.org/pypi/setuptools">setuptools</a>, <a class="reference external" href="http://www.makotemplates.org/">mako</a>, <a class="reference external" href="http://github.com/mikeal/couchquery">couchquery</a>, <a class="reference external" href="http://github.com/mikeal/webenv">webenv</a>. If you do not have setuptools installed already you will want to:</p>
+<div class="highlight-python"><pre>$ curl -O http://peak.telecommunity.com/dist/ez_setup.py
+$ python ez_setup.py</pre>
+</div>
+<p>Now you can install testbot, easy_install will handle installing the other dependencies:</p>
+<div class="highlight-python"><pre>$ easy_install testbot</pre>
+</div>
+<p>The source code is publicly <a class="reference external" href="http://github.com/mikeal/testbot">available on github</a>. Tickets should be logged on the <a class="reference external" href="http://github.com/mikeal/testbot/issues">github issues tracker</a>.</p>
+<p>The process for code contributions is for users to <a class="reference external" href="http://help.github.com/forking/">fork the repository on github</a>, push modifications to their public fork, and then send <a class="reference external" href="http://github.com/mikeal">mikeal</a> a <a class="reference external" href="http://github.com/guides/pull-requests">pull request</a>.</p>
+</div>
+<div class="section" id="module-testbot">
+<span id="creating-a-client"></span><h2>Creating a client<a class="headerlink" href="#module-testbot" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to write a client is to subclass <tt class="xref docutils literal"><span class="pre">Client</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">testbot.client</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="k">class</span> <span class="nc">MyClient</span><span class="p">(</span><span class="n">Client</span><span class="p">):</span>
+    <span class="n">jobtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;my-test-type&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">do_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+        <span class="c"># Job handler</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&quot;result&quot;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span> <span class="s">&quot;debug&quot;</span><span class="p">:</span><span class="s">&quot;We should write code that actually handles this job&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>You can now start the client. If you would like to block indefinitely you can call <tt class="xref docutils literal"><span class="pre">Client.run()</span></tt>, if you would like to start a background thread to handle jobs you can use <tt class="xref docutils literal"><span class="pre">Client.start()</span></tt>. If you start a Client instance using <tt class="xref docutils literal"><span class="pre">Client.start()</span></tt> you can stop it using <tt class="xref docutils literal"><span class="pre">Client.stop()</span></tt>. Calling <tt class="xref docutils literal"><span class="pre">Client.stop()</span></tt> will block until the current do_job call finishes if one is currently running.</p>
+<p>Clients register with the testbot server, by default they create an attribute called <cite>capabilities</cite> which includes two other attributes, <cite>platform</cite> and <cite>jobtypes</cite>. In the example above only <cite>jobtypes</cite> is defined, which will be included in this capabilities information. By default <tt class="xref docutils literal"><span class="pre">Client</span></tt> pulls platform information out of the Python interpreter which works for most client&#8217;s but this can be overwritten.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">tesbot &#8211; Test Automation and Distribution System</a><ul>
+<li><a class="reference external" href="#installation">Installation</a></li>
+<li><a class="reference external" href="#module-testbot">Creating a client</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="">testbot v0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Mikeal Rogers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
