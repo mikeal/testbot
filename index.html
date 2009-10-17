@@ -95,6 +95,25 @@ $ python ez_setup.py</pre>
 </pre></div>
 </div>
 <p>The example is a client that can run Python unittests on multiple versions of Python by making shell calls out to different Python binaries. The server will be able to use this information when assigning jobs to this client.</p>
+<p>After the client is registered it starts sending a heartbeat every 60 seconds (this is configurable). In it&#8217;s heartbeat it sends all the information it can about the client&#8217;s current state. Your client instance will have an attribute called <cite>client_info</cite> which you can add status and debugging information to that will be reported to the server in every heartbeat.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyClient</span><span class="p">(</span><span class="n">Client</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">do_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">()</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s">&#39;http://www.facebook.com&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="mf">200</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client_info</span><span class="p">[</span><span class="s">&#39;firewall_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Inside some crap corporate network&#39;</span>
+</pre></div>
+</div>
+<p>If you don&#8217;t want to wait for the next heartbeat to come around you can push this information immediately using <tt class="xref docutils literal"><span class="pre">Client.push_status()</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">client_info</span><span class="p">[</span><span class="s">&#39;firewall_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Inside some crap corporate network&#39;</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">push_status</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Any information you like can be added to <cite>client_info</cite> but one of the more useful things you can modify is information about the current job. Before <tt class="xref docutils literal"><span class="pre">Client.do_job()</span></tt> is called it adds the current job to client_info. Any modifications you make to that job will also be sent in the next heartbeat.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">client_info</span><span class="p">[</span><span class="s">&#39;firewall_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Inside some crap corporate network&#39;</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">client_info</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">][</span><span class="s">&#39;firewall_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Test was run inside a corporate network&#39;</span>
+</pre></div>
+</div>
+<p>Since testbot uses JSON as it&#8217;s data format all the different objects are extensible.</p>
 </div>
 </div>
 

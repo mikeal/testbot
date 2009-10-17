@@ -77,5 +77,22 @@ If necessary, you can even override the entire capabilities attribute if you nee
 
 The example is a client that can run Python unittests on multiple versions of Python by making shell calls out to different Python binaries. The server will be able to use this information when assigning jobs to this client.
 
+After the client is registered it starts sending a heartbeat every 60 seconds (this is configurable). In it's heartbeat it sends all the information it can about the client's current state. Your client instance will have an attribute called `client_info` which you can add status and debugging information to that will be reported to the server in every heartbeat. ::
 
+   class MyClient(Client):
+       def do_job(self, job):
+           resp, content = httplib2.Http().request('http://www.facebook.com')
+           if resp.status != 200:
+               self.client_info['firewall_info'] = 'Inside some crap corporate network'
 
+If you don't want to wait for the next heartbeat to come around you can push this information immediately using :meth:`Client.push_status`. ::
+
+    self.client_info['firewall_info'] = 'Inside some crap corporate network'
+    self.push_status()
+
+Any information you like can be added to `client_info` but one of the more useful things you can modify is information about the current job. Before :meth:`Client.do_job` is called it adds the current job to client_info. Any modifications you make to that job will also be sent in the next heartbeat. ::
+
+    self.client_info['firewall_info'] = 'Inside some crap corporate network'
+    self.client_info['job']['firewall_info'] = 'Test was run inside a corporate network'
+
+Since testbot uses JSON as it's data format all the different objects are extensible.
