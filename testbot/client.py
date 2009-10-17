@@ -18,7 +18,7 @@ class JobException(Exception): pass
 class Client(object):
     heartbeat_interval = 60
     waiting_sleep = 60
-    job_types = []
+    jobtypes = []
     
     def __init__(self, server_uri, name):
         if not server_uri.endswith('/'):
@@ -41,21 +41,21 @@ class Client(object):
     
     @property
     def capabilities(self):
-        return self.get_default_capabilities()
+        return {'platform':self.platform, 'jobtypes':self.jobtypes}
     
-    def get_default_capabilities(self):
-        # Get the operating system and all that jazz     
+    @property
+    def platform(self):
         sysname, nodename, release, version, machine = os.uname()
-        sysinfo = {'os.name':sysname, 'hostname':nodename, 'os.version.number':release,
-                   'os.version.string':version, 'arch':machine}
+        sysinfo = {'os.name':sysname, 'os.hostname':nodename, 'os.version.number':release,
+                   'os.version.string':version, 'os.arch':machine}
         if sys.platform == 'darwin':
             import platform
-            sysinfo['mac_ver'] = platform.mac_ver()
+            sysinfo['os.mac.version'] = platform.mac_ver()
         elif sys.platform == 'linux2':
             import platform
-            sysinfo['linux_distrobution'] = platform.linux_distrobution()
-            sysinfo['libc_ver'] = platform.libc_ver()           
-        return {'capabilities':{'sysinfo':sysinfo},'jobtypes':self.jobtypes}
+            sysinfo['os.linux.distrobution'] = platform.linux_distrobution()
+            sysinfo['os.libc.ver'] = platform.libc_ver()
+        return sysinfo
         
     def get_job(self):
         resp, content = http.request(self.server_uri+'api/getJob', method='POST', body=json.dumps(self.client_info))
