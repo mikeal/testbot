@@ -6,6 +6,11 @@
 tesbot -- Test Automation and Distribution System
 =================================================
 
+.. module:: testbot
+   :synopsis: Test Automation and Distribution System.
+.. moduleauthor:: Mikeal Rogers <mikeal.rogers@gmail.com>
+.. sectionauthor:: Mikeal Rogers <mikeal.rogers@gmail.com>
+
 Testbot is a continuous integration server and client for distributing and running tests. It uses simple REST and JSON interfaces so that it can be easily extensible.
 
 .. toctree::
@@ -74,7 +79,3 @@ The example is a client that can run Python unittests on multiple versions of Py
 
 
 
-.. module:: testbot
-   :synopsis: Test Automation and Distribution System.
-.. moduleauthor:: Mikeal Rogers <mikeal.rogers@gmail.com>
-.. sectionauthor:: Mikeal Rogers <mikeal.rogers@gmail.com>
