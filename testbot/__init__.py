@@ -49,8 +49,8 @@ class MozillaManager(object):
     
     def new_build(self, build):
         jobs = []
-        for testtype in ['mochitest', 'reftest', 'mochitest-chrome']:
-            jobs.append({'build':build, 'testtype':testtype})
+        for jobtype in ['mochitest', 'reftest', 'mochitest-chrome']:
+            jobs.append({'build':build, 'jobtype':jobtype})
         return jobs
 
 

@@ -45,7 +45,7 @@ $(document).ready(function()
           <tr>
             <th>timestamp</th>
             <th>status</th>
-            <th>testtype</th>
+            <th>jobtype</th>
           </tr>
         </thead>
         <tbody>
@@ -53,7 +53,7 @@ $(document).ready(function()
           <tr>
             <td><a href="/jobs/${job['_id']}">${job['creationdt']}</a></td>
             <td>${job['status']}</td>
-            <td>${job['testtype']}</td>
+            <td>${job['jobtype']}</td>
           </tr>
 % endfor
         </tbody>
