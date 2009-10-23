@@ -4,7 +4,7 @@ from wsgiref.simple_server import make_server
 
 from couchquery import Database, createdb, deletedb
 
-from testbot import sync
+from testbot import sync, MozillaManager
 from testbot.server import TestBotApplication
 
 
@@ -12,7 +12,7 @@ def setup_module(module):
     db = Database('http://localhost:5984/test_testbot')
     createdb(db)
     sync(db)
-    application = TestBotApplication(db)
+    application = TestBotApplication(db, MozillaManager())
     httpd = make_server('', 8888, application)
     print "Serving on http://localhost:8888/"
     thread = Thread(target=httpd.serve_forever)
