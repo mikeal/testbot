@@ -46,14 +46,14 @@ class Client(object):
     @property
     def platform(self):
         sysname, nodename, release, version, machine = os.uname()
-        sysinfo = {'os.name':sysname, 'os.hostname':nodename, 'os.version.number':release,
+        sysinfo = {'os.sysname':sysname, 'os.hostname':nodename, 'os.version.number':release,
                    'os.version.string':version, 'os.arch':machine}
         if sys.platform == 'darwin':
             import platform
             sysinfo['os.mac.version'] = platform.mac_ver()
         elif sys.platform == 'linux2':
             import platform
-            sysinfo['os.linux.distrobution'] = platform.linux_distrobution()
+            sysinfo['os.linux.distribution'] = platform.linux_distribution()
             sysinfo['os.libc.ver'] = platform.libc_ver()
         return sysinfo
         

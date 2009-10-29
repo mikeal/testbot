@@ -74,6 +74,7 @@ class TestBotAPI(RestApplication):
         RestApplication.__init__(self)
         self.db = db
         self.manager = manager
+        self.manager.db = db
         
     def POST(self, request, collection, resource=None):
         if collection == 'getJob':
@@ -81,18 +82,14 @@ class TestBotAPI(RestApplication):
             client = self.db.get(client_dict['_id'])
             if dict(client) != client_dict:
                 client.update(client_dict)
-                
-            # Simplest job logic, pulls each jobtype by creation
-            for jobtype in client['capabilities']['jobtypes']:
-                result = self.db.views.jobs.pendingByJobtype(startkey=[jobtype, None],
-                                                             endkey=[jobtype, {}],limit=1)
-                if len(result) is 1:
-                    job = result[0]
-                    job.status = 'locked'
-                    self.db.save(job)
-                    return JSONResponse(job)
-            return Response204()    
-        
+            
+            job = self.manager.get_job(client)
+            if job is not None:
+                job.status = 'locked'
+                self.db.save(job)
+                return JSONResponse(job)
+            return Response204()
+            
         if collection == 'newBuild':
             build = json.loads(str(request.body))
             build['type'] = 'build'
