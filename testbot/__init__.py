@@ -50,6 +50,18 @@ class TestBotManager(object):
 class MozillaManager(object):
     """Logic for handling Mozilla's builds and tests"""
     
+    all_mobile_testtypes = [
+        # Unittests
+        'mochitest', 'mochitest-chrome', 'browser-chrome', 'reftest', 'crashtest', 
+        'js-reftest', 'xpcshell',
+        # Talos
+        'talos-ts', 'talos-ts_cold', 'talos-ts_places_generated_max', 
+        'talos-ts_places_generated_min', 'talos-ts_places_generated_med', 
+        'talos-tp', 'talos-tp4', 'talos-tp_js', 'talos-tdhtml', 'talos-tgfx', 
+        'talos-tsvg', 'talos-twinopen', 'talos-tjss', 'talos-tsspider', 
+        'talos-tpan', 'talos-tzoom',
+        ]
+    
     def get_job(self, client):
         if client['platform'].get('os.sysname', None) == 'Linux':
             if client['platform'].get('os.linux.distrobution',[]).get(0,None) == 'CentOS':
@@ -65,6 +77,7 @@ class MozillaManager(object):
                         return result[0]
                     supported_jobtypes.remove(jtype)
                 # No jobs were found
+        
                 return None
     
     def new_build(self, build):
@@ -77,10 +90,44 @@ class MozillaManager(object):
                 build_uri = build_uri[0]
                 tests_uri = tests_uri[0]    
                 for jobtype in ['mochitest', 'reftest', 'mochitest-chrome']:
-                    jobs.append({'build':build, 'jobtype':jobtype, 'build_uri':build_uri, 'tests_uri':tests_uri, 'platform':{'os.sysname':'Linux'}})
+                    jobs.append({'build':build, 'jobtype':jobtype, 'package_uri':build_uri, 
+                                 'tests_uri':tests_uri, 'platform':{'os.sysname':'Linux'},
+                                 'product':'Firefox'})
             else:
                 # Build is invalid
                 build['invalid'] = True
+                return None        
+        elif build['branch'] == 'mobile-1.9.2-wince':
+            tests_uri = [u for u in build['uris'] if u.endswith('.tests.tar.bz2')]
+            winCE_package = [u for u in build['uris'] if u.endswith('.wince-arm.zip')]
+            
+            if len(winCE_package) is 0 or len(tests_uri) is 0:
+                build['invalid'] = True
+                return None # Build is invalid
+            tests_uri = tests_uri[0]
+            winCE_package = winCE_package[0]
+            
+            for jobtype in self.all_mobile_testtypes:
+                jobs.append({'build':build, 'jobtype':jobtype, 'package_uri':winCE_package,
+                             'tests_uri':tests_uri, 'product':'FirefoxCE', 
+                             'platform':{'os.sysname':"WinCE", 'hardware':'Tegra'}})
+        elif build['branch'] == 'mobile-1.9.2':
+            fennec_uris = [u for u in build['uris'] if u.startswith('fennec')]
+            xulrunner_uris = [u for u in build['uris'] if u.startswith('xulrunner')]
+
+            # fennec builds currently don't produce a test package
+            # fennec_tests_uri = [u for u in fennec_uris if u.endswith('.tests.tar.bz2')]
+            # if len(fennec_tests_uri) is 0:
+            #     build['invalid'] = True
+            #     return None # Build is invalid
+            
+            xulrunner_tests_uri = [u for u in xulrunner_uris if u.endswith('.tests.tar.bz2')]
+            if len(xulrunner_tests_uri) is 0:
+                build['invalid'] = True
+                return None # Build is invalid
+            
+            
+            
         return jobs
 
 
