@@ -99,6 +99,8 @@ class TestBotAPI(RestApplication):
             build['_id'] = build_info['id']
             build['_rev'] = build_info['rev']
             jobs = self.manager.new_build(build)
+            if jobs is None:
+                jobs = []
             for job in jobs:
                 job['type'] = 'job'
                 job['status'] = 'pending'
