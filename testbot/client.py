@@ -51,13 +51,14 @@ class Client(object):
         if sys.platform == 'darwin':
             import platform
             sysinfo['os.mac.version'] = platform.mac_ver()
-        elif sys.platform == 'linux2':
+        elif sys.platform == 'linux':
             import platform
             sysinfo['os.linux.distribution'] = platform.linux_distribution()
             sysinfo['os.libc.ver'] = platform.libc_ver()
         return sysinfo
         
     def get_job(self):
+        print "get_job uri = " + self.server_uri + 'api/getJob'
         resp, content = http.request(self.server_uri+'api/getJob', method='POST', body=json.dumps(self.client_info))
         assert resp
         if resp.status == 200:

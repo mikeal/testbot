@@ -77,6 +77,7 @@ class TestBotAPI(RestApplication):
         self.manager.db = db
         
     def POST(self, request, collection, resource=None):
+        print "testBotAPI::Post request = " + str(request)
         if collection == 'getJob':
             client_dict = json.loads(str(request.body))
             client = self.db.get(client_dict['_id'])

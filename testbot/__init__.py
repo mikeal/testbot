@@ -63,8 +63,11 @@ class MozillaManager(object):
         ]
     
     def get_job(self, client):
-        if client['platform'].get('os.sysname', None) == 'Linux':
-            if client['platform'].get('os.linux.distrobution',[]).get(0,None) == 'CentOS':
+        print "MozillaManager - get_job"
+        print str(client)
+        if client['capabilities']['platform'].get('os.sysname', None) == 'Linux':
+            print "Client is linux"
+            if client['capabilities']['platform'].get('os.linux.distrobution',[None])[0] == 'CentOS':
                 # Desktop linux
                 supported_jobtypes = client['jobtypes']
                 
