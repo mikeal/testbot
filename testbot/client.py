@@ -69,9 +69,6 @@ class Http(httplib2.Http):
                         cachekey = None
                         cached_value = None
             else: cachekey = None
-            if method in self.optimistic_concurrency_methods and self.cache and info.has_key('etag') and not self.ignore_etag and 'if-match' not in headers:
-                # http://www.w3.org/1999/04/Editing/
-                headers['if-match'] = info['etag']
             if method not in ["GET", "HEAD"] and self.cache and cachekey:
                 # RFC 2616 Section 13.10
                 self.cache.delete(cachekey)
