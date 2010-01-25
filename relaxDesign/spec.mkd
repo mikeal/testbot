@@ -1,0 +1,15 @@
+
+# GitHub Noitification
+## - POST /relax/newCommit/_update/ @notification
+### Creates Commit Object
+### POST to create Build Object
+## - POST /relax/builder/_update/ @notification
+## - GET  /relax/builder/_show/ @getJob
+### Compile build for commit
+### Compile latest release
+### Compile latest trunk
+### Start _changes RPC on the test server side
+## - POST /relax/perfTester/_update/ @notification
+### Start Client
+### Start _changes RPC on the test client side
+### Run tests, use _changes RPC
